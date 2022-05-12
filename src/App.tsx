@@ -5,21 +5,27 @@ import { Redirect } from '@shopify/app-bridge/actions';
 import { AppProvider as PolarisProvider } from '@shopify/polaris';
 import translations from '@shopify/polaris/locales/en.json';
 import '@shopify/polaris/build/esm/styles.css';
-
+import { useState } from 'react';
 import { EmptyStatePage } from './components/EmptyStatePage';
+import { ProductsPage } from './components/ProductsPage';
 
 export default function App() {
+  const [selection, setSelection] = useState([]);
   return (
     <PolarisProvider i18n={translations}>
       <AppBridgeProvider
         config={{
-          apiKey: process.env.SHOPIFY_API_KEY,
-          host: new URL(location).searchParams.get('host'),
+          apiKey: process.env.SHOPIFY_API_KEY as string,
+          host: new URL(location as unknown as string).searchParams.get('host') as string,
           forceRedirect: true,
         }}
       >
         <MyProvider>
-          <EmptyStatePage />
+          {selection.length > 0 ? (
+            <ProductsPage productIds={selection} />
+          ) : (
+            <EmptyStatePage setSelection={setSelection} />
+          )}
         </MyProvider>
       </AppBridgeProvider>
     </PolarisProvider>
